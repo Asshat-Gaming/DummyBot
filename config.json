@@ -4,5 +4,13 @@
   "SOUNDCLOUD_CLIENT_ID": "INSERT-CLIENT-ID-HERE",
   "MAX_PLAYLIST_SIZE": 1000,
   "PREFIX": "dummy ",
-  "PRUNING": false
+  "PRUNING": false,
+  "twitch_channels": "INSERT-CHANNEL-NAME-HERE,INSERT-CHANNEL-NAME-HERE",
+  "discord_announce_channel": "INSERT-CHANNEL-NAME-HERE",
+  "discord_mentions": {
+  },
+  "twitch_client_id": "INSERT-CLIENT-ID-HERE",
+  "twitch_oauth_token": "INSERT-TOKEN-HERE",
+  "twitch_check_interval_ms": 60000,
+  "twitch_use_boxart": true
 }
