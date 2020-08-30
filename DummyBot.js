@@ -118,14 +118,22 @@ client.on("guildDelete", guild => {
 });
 
 client.on("message", async (message) => {
-  if (message.content.startsWith("ding")) {
+  if (message.content === ("ding")) {
     message.channel.send("dong!");
   }
 
-  if (message.content.startsWith("bading")) {
+  if (message.content === ("bading")) {
     message.channel.send("badong!");
   }
-  
+
+  if (message.content === ("dingaling")) {
+    message.channel.send("dongalong!");
+  }
+
+  if (message.content === ("dingalingadingdong")) {
+    message.channel.send("dongalongadongding!");
+  }
+
   if (message.content.startsWith("poo")) {
     message.channel.send("Aww shit!");
   }
@@ -149,16 +157,16 @@ client.on("message", async (message) => {
     message.channel.send("Who? That guy? He's a bad bot!");
   }
 	
-  if (message.content.startsWith("you're not my dad")) {
+  if (message.content === ("you're not my dad")) {
     message.channel.send("bitch, yes I am");
   }
 
-  if (message.content.startsWith("LASAGNA!!!")) {
+  if (message.content === ("LASAGNA!!!")) {
     message.channel.send("Lasagna sucks. It's all about that fettuccine alfredo!");
 	message.channel.send("I'm disappointed");
   }
 
-  if (message.content.includes("hi disappointed, I'm dad")) {
+  if (message.content === ("hi disappointed, I'm dad")) {
     message.channel.send("Okay mom...");
   }
   
