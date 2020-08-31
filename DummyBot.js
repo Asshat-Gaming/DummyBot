@@ -1,7 +1,12 @@
+'use strict';
+
 /**
  * Module Imports
  */
+require('dotenv').config();
+
 const { Client, Collection } = require("discord.js");
+const Discord = require("discord.js");
 const { readdirSync } = require("fs");
 const { join } = require("path");
 const { TOKEN, PREFIX } = require("./config.json");
@@ -14,6 +19,11 @@ const DiscordChannelSync = require("./discord-channel-sync");
 const LiveEmbed = require('./live-embed');
 const MiniDb = require('./minidb');
 
+const request = require('request');
+const entities = require('entities');
+const logger = require('./logger');
+const validUrl = require('valid-url');
+
 const client = new Client({ disableMentions: "everyone" });
 
 global.discordJsClient = client;
@@ -24,6 +34,12 @@ client.prefix = PREFIX;
 client.queue = new Map();
 const cooldowns = new Collection();
 const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+let botReady = false;
+let lastTimestamp = Math.floor(Date.now() / 1000);
+
+let Guild;
+let Channel;
 
 /**
  * Client Events
@@ -42,9 +58,26 @@ client.on("ready", () => {
 
   // Begin Twitch API polling
   TwitchMonitor.start();
+  
+  Guild = client.guilds.cache.get(process.env.DISCORD_SERVERID);
+  if (Guild) {
+    Channel = Guild.channels.cache.get(process.env.DISCORD_CHANNELID);
+  }
+
+  if (!Channel) {
+    logger.error('A matching channel could not be found. Please check your DISCORD_SERVERID and DISCORD_CHANNELID environment variables.');
+    process.exit(1);
+  } else {
+    botReady = true;
+  }
 });
+
 client.on("warn", (info) => console.log(info));
-client.on("error", console.error);
+client.on("error", () => {
+	console.log(console.error);
+	botReady = false;
+});
+client.on('shardReconnecting', id => console.log(`Reconnecting to shard ID ${id}`));
 
 /**
  * Import all commands
@@ -454,4 +487,43 @@ Array.prototype.hasEqualValues = function (b) {
     }
 
     return true;
-}
+};
+
+const subredditUrl = `https://www.reddit.com/r/${process.env.SUBREDDIT}/new.json?limit=10`;
+
+setInterval(() => {
+  if (botReady) {
+    request({
+      url: subredditUrl,
+      json: true,
+    }, (error, response, body) => {
+      if (!error && response.statusCode === 200) {
+        logger.debug('Request succeeded, lastTimestamp = ', lastTimestamp);
+        for (const post of body.data.children.reverse()) {
+          if (lastTimestamp <= post.data.created_utc) {
+            lastTimestamp = post.data.created_utc;
+
+            const embed = new Discord.MessageEmbed();
+            embed.setColor(process.env.EMBED_COLOR || '#007cbf');
+            embed.setTitle(`${post.data.link_flair_text ? `[${post.data.link_flair_text}] ` : ''}${entities.decodeHTML(post.data.title)}`);
+            embed.setURL(`https://redd.it/${post.data.id}`);
+            embed.setDescription(`${post.data.is_self ? entities.decodeHTML(post.data.selftext.length > 253 ? post.data.selftext.slice(0, 253).concat('...') : post.data.selftext) : ''}`);
+            embed.setThumbnail(validUrl.isUri(post.data.thumbnail) ? entities.decodeHTML(post.data.thumbnail) : null);
+            embed.setFooter(`${post.data.is_self ? 'Self post' : 'Link post'} by ${post.data.author}`);
+            embed.setTimestamp(new Date(post.data.created_utc * 1000));
+
+            Channel.send({ embed: embed}).then(() => {
+              logger.debug(`Sent message for new post https://redd.it/${post.data.id}`);
+            }).catch(err => {
+              logger.error(embed, err);
+            });
+          }
+        }
+        ++lastTimestamp;
+      } else {
+        logger.warn('Request failed - reddit could be down or subreddit doesn\'t exist. Will continue.');
+        logger.debug(response, body);
+      }
+    });
+  }
+}, 30 * 1000); // 30 seconds
