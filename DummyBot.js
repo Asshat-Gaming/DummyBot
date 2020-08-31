@@ -10,9 +10,7 @@ const axios = require('axios');
 const Cleverbot = require('clevertype').Cleverbot;
 
 const TwitchMonitor = require("./twitch-monitor");
-const FooduseMonitor = require("./fooduse-monitor");
 const DiscordChannelSync = require("./discord-channel-sync");
-const ElizaHelper = require('./eliza');
 const LiveEmbed = require('./live-embed');
 const MiniDb = require('./minidb');
 
@@ -44,9 +42,6 @@ client.on("ready", () => {
 
   // Begin Twitch API polling
   TwitchMonitor.start();
-
-  // Activate Food Use integration
-  FooduseMonitor.start();
 });
 client.on("warn", (info) => console.log(info));
 client.on("error", console.error);
