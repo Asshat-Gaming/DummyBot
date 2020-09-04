@@ -1,10 +1,12 @@
 'use strict';
 
-const winston = require('winston');
+const { createLogger, transports } = require('winston');
 
-module.exports = new winston.Logger({
+const logger = createLogger({
   level: process.env.LOGGING_LEVEL || 'info',
   transports: [
-    new (winston.transports.Console)(),
+    new transports.Console(),
   ],
 });
+
+module.exports = logger;
