@@ -169,6 +169,10 @@ client.on("message", async (message) => {
   if (message.content.startsWith("What is the website")) {
     message.channel.send("It's https://www.asshatgaming.com/ ya big dummy!");
   }
+
+  if (message.content.startsWith("kaboom")) {
+    message.channel.send("HIT THE DECK!!!");
+  }
 	
   var dummybotuser1 = "745221937889935440";
   if(message.mentions.users.has(dummybotuser1)) {

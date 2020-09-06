@@ -3,12 +3,12 @@ const { MessageEmbed } = require("discord.js");
 module.exports = {
   name: "help",
   aliases: ["h"],
-  description: "Display all commands and descriptions",
+  description: "Display the first page of all commands and descriptions",
   execute(message) {
     let commands = message.client.commands.array();
 
     let helpEmbed = new MessageEmbed()
-      .setTitle("Dummy Bot Help")
+      .setTitle("Dummy Bot Help - Page 1")
       .setDescription("List of all commands")
       .setColor("#F8AA2A");
 
@@ -20,7 +20,11 @@ module.exports = {
       );
     });
 
-    helpEmbed.setTimestamp();
+    helpEmbed.addField(
+	  `**${message.client.prefix}help2**`,
+	  `Display the second page of all commands and descriptions`,
+      true
+	);
 
     return message.channel.send(helpEmbed).catch(console.error);
   }
