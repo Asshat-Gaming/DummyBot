@@ -14,7 +14,8 @@ module.exports = {
 
         await message.channel.messages.fetch({limit: amount}).then(messages => {
 			if ((message.member.roles.cache.find(r => r.name === "Moderator (Discord)")) || (message.member.roles.cache.find(r => r.name === "Administrator (Discord)")) || (message.member.roles.cache.find(r => r.name === "Manager (Discord)")) || (message.member.roles.cache.find(r => r.name === "Division Leader (Discord)")) || (message.member.roles.cache.find(r => r.name === "Community Leader")) || (message.member.roles.cache.find(r => r.name === "Server Owner"))) {
-				message.channel.bulkDelete(messages);
+				const notPinned = messages.filter(fetchedMsg => !fetchedMsg.pinned);
+				message.channel.bulkDelete(notPinned, true);
 				return message.channel.send('Messages cleared successfully.').catch(console.error);
 			}
 			else
