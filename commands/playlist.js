@@ -1,14 +1,15 @@
 const { MessageEmbed } = require("discord.js");
 const { play } = require("../include/play");
-const { YOUTUBE_API_KEY, MAX_PLAYLIST_SIZE } = require("../config.json");
+const { YOUTUBE_API_KEY, MAX_PLAYLIST_SIZE, SOUNDCLOUD_CLIENT_ID } = require("../config.json");
 const YouTubeAPI = require("simple-youtube-api");
 const youtube = new YouTubeAPI(YOUTUBE_API_KEY);
+const scdl = require("soundcloud-downloader")
 
 module.exports = {
   name: "playlist",
   cooldown: 3,
   aliases: ["pl"],
-  description: "Play a playlist from youtube",
+  description: "Play a playlist from YouTube or SoundCloud",
   async execute(message, args) {
     const { PRUNING } = require("../config.json");
     const { channel } = message.member.voice;
@@ -27,7 +28,7 @@ module.exports = {
     if (!permissions.has("CONNECT"))
       return message.reply("Cannot connect to voice channel, missing permissions");
     if (!permissions.has("SPEAK"))
-      return message.reply("I cannot speak in this voice channel, make sure I have the proper permissions!");
+      return message.reply("I cannot speak in this voice channel. Please make sure I have the proper permissions!");
 
     const search = args.join(" ");
     const pattern = /^.*(youtu.be\/|list=)([^#\&\?]*).*/gi;
@@ -54,7 +55,17 @@ module.exports = {
         videos = await playlist.getVideos(MAX_PLAYLIST_SIZE || 10, { part: "snippet" });
       } catch (error) {
         console.error(error);
-        return message.reply("Playlist not found :(").catch(console.error);
+        return message.reply("Playlist not found. :(").catch(console.error);
+      }
+    } else if (scdl.isValidUrl(args[0])) {
+      if (args[0].includes('/sets/')) {
+        message.channel.send('⌛ Fetching the playlist...')
+        playlist = await scdl.getSetInfo(args[0], SOUNDCLOUD_CLIENT_ID)
+        videos = playlist.tracks.map(track => ({
+          title: track.title,
+          url: track.permalink_url,
+          duration: track.duration / 1000
+        }))
       }
     } else {
       try {
@@ -63,7 +74,7 @@ module.exports = {
         videos = await playlist.getVideos(MAX_PLAYLIST_SIZE || 10, { part: "snippet" });
       } catch (error) {
         console.error(error);
-        return message.reply("Playlist not found :(").catch(console.error);
+        return message.reply("Playlist not found. :(").catch(console.error);
       }
     }
 
@@ -98,7 +109,7 @@ module.exports = {
           playlistEmbed.description.substr(0, 2007) + "\nPlaylist larger than character limit...";
     }
 
-    message.channel.send(`${message.author} Started a playlist`, playlistEmbed);
+    message.channel.send(`${message.author} started a playlist`, playlistEmbed);
 
     if (!serverQueue) message.client.queue.set(message.guild.id, queueConstruct);
 

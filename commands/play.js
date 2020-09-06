@@ -1,5 +1,5 @@
 const { play } = require("../include/play");
-const { YOUTUBE_API_KEY, SOUNDCLOUD_CLIENT_ID } = require("../config.json");
+const { DEFAULT_VOLUME, YOUTUBE_API_KEY, SOUNDCLOUD_CLIENT_ID } = require("../config.json");
 const ytdl = require("ytdl-core");
 const YouTubeAPI = require("simple-youtube-api");
 const youtube = new YouTubeAPI(YOUTUBE_API_KEY);
@@ -39,6 +39,8 @@ module.exports = {
     // Start the playlist if playlist url was provided
     if (!videoPattern.test(args[0]) && playlistPattern.test(args[0])) {
       return message.client.commands.get("playlist").execute(message, args);
+    } else if (scdl.isValidUrl(url) && url.includes("/sets/")) {
+      return message.client.commands.get("playlist").execute(message, args);
     }
 
     const queueConstruct = {
@@ -47,7 +49,7 @@ module.exports = {
       connection: null,
       songs: [],
       loop: false,
-      volume: 30,
+      volume: DEFAULT_VOLUME,
       playing: true
     };
 
@@ -72,7 +74,7 @@ module.exports = {
         song = {
           title: trackInfo.title,
           url: trackInfo.permalink_url,
-          duration: trackInfo.duration / 1000
+          duration: Math.ceil(trackInfo.duration / 1000)
         };
       } catch (error) {
         if (error.statusCode === 404)
