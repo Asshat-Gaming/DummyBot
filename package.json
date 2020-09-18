@@ -19,7 +19,7 @@
     "entities": "^2.0.3",
     "ffmpeg-static": "^4.2.7",
     "humanize-duration": "^3.23.1",
-    "lyrics-finder": "^21.3.3",
+    "lyrics-finder": "^21.4.0",
     "request": "^2.88.2",
     "simple-youtube-api": "^5.2.1",
     "soundcloud-downloader": "^0.1.6",
@@ -27,7 +27,7 @@
     "valid-url": "^1.0.9",
     "winston": "^3.3.3",
     "ytdl-core": "^3.2.2",
-    "ytdl-core-discord": "^1.2.1"
+    "ytdl-core-discord": "^1.2.2"
   },
   "scripts": {
     "start": "node DummyBot.js"
