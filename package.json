@@ -26,8 +26,8 @@
     "string-progressbar": "^1.0.1",
     "valid-url": "^1.0.9",
     "winston": "^3.3.3",
-    "ytdl-core": "^3.2.2",
-    "ytdl-core-discord": "^1.2.2"
+    "ytdl-core": "^3.3.0",
+    "ytdl-core-discord": "^1.2.3"
   },
   "scripts": {
     "start": "node DummyBot.js"
