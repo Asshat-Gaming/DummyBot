@@ -1,5 +1,5 @@
 const ytdlDiscord = require("ytdl-core-discord");
-const scdl = require("soundcloud-downloader");
+const scdl = require("soundcloud-downloader").default;
 const { canModifyQueue } = require("../util/DummyBotUtil");
 
 module.exports = {

@@ -3,7 +3,7 @@ const { DEFAULT_VOLUME, YOUTUBE_API_KEY, SOUNDCLOUD_CLIENT_ID } = require("../co
 const ytdl = require("ytdl-core");
 const YouTubeAPI = require("simple-youtube-api");
 const youtube = new YouTubeAPI(YOUTUBE_API_KEY);
-const scdl = require("soundcloud-downloader");
+const scdl = require("soundcloud-downloader").default;
 
 module.exports = {
   name: "play",
