@@ -9,10 +9,13 @@ const { Client, Collection } = require("discord.js");
 const Discord = require("discord.js");
 const { readdirSync } = require("fs");
 const { join } = require("path");
-const { TOKEN, PREFIX } = require("./config.json");
+const { TOKEN, PREFIX, LOCALE, MONGO } = require("./config.json");
+const path = require("path");
+const i18n = require("i18n");
 const config = require('./config.json');
 const axios = require('axios');
 const Cleverbot = require('clevertype').Cleverbot;
+const mongoose = require('mongoose');
 
 const TwitchMonitor = require("./twitch-monitor");
 const DiscordChannelSync = require("./discord-channel-sync");
@@ -34,6 +37,31 @@ client.prefix = PREFIX;
 client.queue = new Map();
 const cooldowns = new Collection();
 const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+i18n.configure({
+  locales: ["en", "ko", "fr"],
+  directory: path.join(__dirname, "locales"),
+  defaultLocale: "en",
+  objectNotation: true,
+  register: global,
+
+  logWarnFn: function (msg) {
+    console.log("warn", msg);
+  },
+
+  logErrorFn: function (msg) {
+    console.log("error", msg);
+  },
+
+  missingKeyFn: function (locale, value) {
+    return value;
+  },
+
+  mustacheConfig: {
+    tags: ["{{", "}}"],
+    disable: false
+  }
+});
 
 let botReady = false;
 let lastTimestamp = Math.floor(Date.now() / 1000);
@@ -71,6 +99,13 @@ client.on("ready", () => {
     botReady = true;
   }
 });
+
+  // Ensure that the Mongo database has connected properly
+  mongoose.set('useFindAndModify', false);
+	mongoose.set('useUnifiedTopology', true);
+	mongoose.set('useNewUrlParser', true);
+	mongoose.connect(MONGO);
+  console.log("Connected to MongoDB!")
 
 client.on("warn", (info) => console.log(info));
 client.on("error", () => {
@@ -233,7 +268,7 @@ client.on("message", async (message) => {
     if (now < expirationTime) {
       const timeLeft = (expirationTime - now) / 1000;
       return message.reply(
-        `please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${command.name}\` command.`
+        `Please wait ${timeLeft.toFixed(1)} more second(s) before reusing the \`${command.name}\` command.`
       );
     }
   }

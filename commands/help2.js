@@ -65,6 +65,42 @@ module.exports = {
 	  `Ask the bot its opinion of the atsplenda bot`,
 	  true
 	);
+	
+	helpEmbed.addField(
+      `**dummy playlist-save <playlist name>**`,
+	  `Saves the current queue into a new playlist`,
+	  true
+	);
+	
+	helpEmbed.addField(
+      `**dummy playlist-play <playlist name>**`,
+	  `Plays the specified playlist`,
+	  true
+	);
+	
+	helpEmbed.addField(
+      `**dummy playlist-list**`,
+	  `Lists all saved playlists`,
+	  true
+	);
+	
+	helpEmbed.addField(
+      `**dummy playlist-list <playlist name>**`,
+	  `Lists all songs in the specified playlist`,
+	  true
+	);
+	
+	helpEmbed.addField(
+      `**dummy playlist-edit <playlist name>**`,
+	  `Edits the specified playlist using the provided guide`,
+	  true
+	);
+	
+	helpEmbed.addField(
+      `**dummy playlist-delete <playlist name>**`,
+	  `Deletes the specified playlist`,
+	  true
+	);
 
     return message.channel.send(helpEmbed).catch(console.error);
   }
