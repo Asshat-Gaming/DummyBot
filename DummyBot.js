@@ -16,6 +16,7 @@ const config = require('./config.json');
 const axios = require('axios');
 const Cleverbot = require('clevertype').Cleverbot;
 const mongoose = require('mongoose');
+const blacklistModel = require('./schemas/blacklist');
 
 const TwitchMonitor = require("./twitch-monitor");
 const DiscordChannelSync = require("./discord-channel-sync");
@@ -75,7 +76,7 @@ let Channel;
 client.on("ready", () => {
   console.log(`${client.user.username} ready!`);
   client.user.setPresence({
-      status: "online",  //You can show online, idle....
+      status: "online",
   });
   
   // Init list of connected servers, and determine which channels we are announcing to
@@ -253,6 +254,18 @@ client.on("message", async (message) => {
     client.commands.find((cmd) => cmd.aliases && cmd.aliases.includes(commandName));
 
   if (!command) return;
+
+  if (MONGO) {
+    const blacklisted = await blacklistModel.find();
+
+    let isBlacklisted;
+
+    if (blacklisted) {
+      isBlacklisted = blacklisted.find(u => u.userId === message.author.id)
+    }
+
+    if (isBlacklisted) return;
+  }
 
   if (!cooldowns.has(command.name)) {
     cooldowns.set(command.name, new Collection());

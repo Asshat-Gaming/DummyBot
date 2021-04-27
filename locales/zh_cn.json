@@ -53,13 +53,14 @@
     "description": "播放 YouTube 或 Soundcloud 的音乐",
     "errorNotChannel": "你必须先加入语音频道!",
     "errorNotInSameChannel": "你必须跟 {user} 在同一个频道裡",
-    "usageReply": "Usage: {prefix}play <YouTube 网址 | 影片名称 | Soundcloud 网址>",
+    "usageReply": "Usage: {prefix}play <YouTube 网址 | 影片名称 | Soundcloud 网址 | Spotify 网址>",
     "missingPermissionConnect": "无法连结至语音频道，没有权限",
     "missingPermissionSpeak": "我无法在语音频道裡说话，请确定我有相关的权限!",
     "queueAdded": "✅ **{title}** 已经被 <@{author}> 加入音乐队列",
     "cantJoinChannel": "无法加入语音频道: {error}",
     "queueEnded": "❌ 音乐队列完结",
     "queueError": "错误: {error}",
+    "streamNotAllowed": "流音频直播未启用",
     "startedPlaying": "🎶 开始播放: **{title}** {url}",
     "skipSong": "<@{author}> ⏩ 跳过了歌曲",
     "pauseSong": "<@{author}> ⏸ 暂停了歌曲 music.",
@@ -161,5 +162,16 @@
     "errorNotChannel": "你必须先加入语音频道!",
     "cooldownMessage": "请等待 {time} 秒后再使用 `{name}` 指令",
     "errorCommend": "执行指令时發生错误"
+  },
+  "blacklist": {
+    "description": "阻止用户使用该机器人.",
+    "noType": "请提供类型. 采用 list, add, 要么 remove.",
+    "noBlacklisted": "没有人被列入黑名单.",
+    "provideMember": "请提供用户黑名单.",
+    "botMember": "请不要将机器人列入黑名单.",
+    "alreadyBlacklisted": "用户已被列入黑名单.",
+    "doneBlacklisted": "用户已被列入黑名单.",
+    "notBlacklisted": "用户未列入黑名单.",
+    "userWhitelisted": "用户已列入白名单."
   }
 }

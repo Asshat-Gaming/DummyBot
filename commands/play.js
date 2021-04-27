@@ -1,9 +1,17 @@
 const { play } = require("../include/play");
-const { DEFAULT_VOLUME, YOUTUBE_API_KEY, SOUNDCLOUD_CLIENT_ID } = require("../config.json");
+const https = require("https");
+const { DEFAULT_VOLUME, YOUTUBE_API_KEY, SOUNDCLOUD_CLIENT_ID, SPOTIFY_CLIENT_ID, SPOTIFY_SECRET_ID, ALLOW_AUDIO_STREAM } = require("../config.json");
 const ytdl = require("ytdl-core");
 const YouTubeAPI = require("simple-youtube-api");
 const youtube = new YouTubeAPI(YOUTUBE_API_KEY);
 const scdl = require("soundcloud-downloader").default;
+const spotifyURI = require('spotify-uri');
+const Spotify = require('node-spotify-api');
+
+const spotify = new Spotify({
+  id: SPOTIFY_CLIENT_ID,
+  secret: SPOTIFY_SECRET_ID
+});
 
 module.exports = {
   name: "play",
@@ -33,6 +41,12 @@ module.exports = {
     const videoPattern = /^(https?:\/\/)?(www\.)?(m\.)?(youtube\.com|youtu\.?be)\/.+$/gi;
     const playlistPattern = /^.*(list=)([^#\&\?]*).*/gi;
     const scRegex = /^https?:\/\/(soundcloud\.com)\/(.*)$/;
+    const streamRegex = /^https?:\/\/.*(mp3)$/gi;
+    const mobileScRegex = /^https?:\/\/(soundcloud\.app\.goo\.gl)\/(.*)$/;
+    const spotifyPattern = /^.*(https:\/\/open\.spotify\.com\/track)([^#\&\?]*).*/gi;
+    const spotifyValid = spotifyPattern.test(args[0]);
+    const spotifyPlaylistPattern = /^.*(https:\/\/open\.spotify\.com\/playlist)([^#\&\?]*).*/gi;
+    const spotifyPlaylistValid = spotifyPlaylistPattern.test(args[0])
     const url = args[0];
     const urlValid = videoPattern.test(args[0]);
 
@@ -41,6 +55,24 @@ module.exports = {
       return message.client.commands.get("playlist").execute(message, args);
     } else if (scdl.isValidUrl(url) && url.includes("/sets/")) {
       return message.client.commands.get("playlist").execute(message, args);
+    } else if (spotifyPlaylistValid) {
+      return message.client.commands.get("playlist").execute(message, args);
+    }
+
+    if (mobileScRegex.test(url)) {
+      try {
+        https.get(url, function (res) {
+          if (res.statusCode == "302") {
+            return message.client.commands.get("play").execute(message, [res.headers.location]);
+          } else {
+            return message.reply("No content could be found at that url.").catch(console.error);
+          }
+        });
+      } catch (error) {
+        console.error(error);
+        return message.reply(error.message).catch(console.error);
+      }
+      return message.reply("Following url redirection...").catch(console.error);
     }
 
     const queueConstruct = {
@@ -56,7 +88,29 @@ module.exports = {
     let songInfo = null;
     let song = null;
 
-    if (urlValid) {
+    if (spotifyValid) {
+      let spotifyTitle, spotifyArtist;
+      const spotifyTrackID = spotifyURI.parse(url).id
+      const spotifyInfo = await spotify.request(`https://api.spotify.com/v1/tracks/${spotifyTrackID}`).catch(err => {
+        return message.channel.send(`Oops... \n` + err)
+      })
+      spotifyTitle = spotifyInfo.name
+      spotifyArtist = spotifyInfo.artists[0].name
+
+      try {
+        const final = await youtube.searchVideos(`${spotifyTitle} - ${spotifyArtist}`, 1, { part: 'snippet' });
+        songInfo = await ytdl.getInfo(final[0].url)
+        song = {
+          title: songInfo.videoDetails.title,
+          url: songInfo.videoDetails.video_url,
+          duration: songInfo.videoDetails.lengthSeconds
+        }
+      } catch (err) {
+        console.log(err)
+        return message.channel.send(`Oops.. There was an error! \n ` + err)
+      }
+
+    } else if (urlValid) {
       try {
         songInfo = await ytdl.getInfo(url);
         song = {
@@ -80,6 +134,16 @@ module.exports = {
         if (error.statusCode === 404)
           return message.reply("Could not find that Soundcloud track.").catch(console.error);
         return message.reply("There was an error playing that Soundcloud track.").catch(console.error);
+      }
+    } else if (streamRegex.test(url)) {
+      if (ALLOW_AUDIO_STREAM) {
+        song = {
+          title: "Audio Stream",
+          url: url,
+          duration: 86400 // 24 hours
+        };
+      } else {
+        return message.reply("Streaming live audio is not enabled!").catch(console.error);
       }
     } else {
       try {

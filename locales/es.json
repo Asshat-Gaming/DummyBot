@@ -53,13 +53,14 @@
     "description": "Reproduce música de Youtube o Soundcloud",
     "errorNotChannel": "¡Primero debes unirte a un canal de voz!",
     "errorNotInSameChannel": "Tienes que estár en el mismo canal de voz que {user}",
-    "usageReply": "Cómo usarlo: {prefix}play <URL YouTube | Nombre del vídeo | URL Soundcloud>",
+    "usageReply": "Cómo usarlo: {prefix}play <URL YouTube | Nombre del vídeo | URL Soundcloud | URL Spotify>",
     "missingPermissionConnect": "No se puede conectar al canal de voz, permisos insuficientes.",
     "missingPermissionSpeak": "¡No se pudo reproducir sonidos en este canal, comprueba los permisos!",
     "queueAdded": "✅ Se ha añadido **{title}** a la cola de reproducción por <@{author}>",
     "cantJoinChannel": "No se pudo conectar al canal: {error}",
     "queueEnded": "❌ Cola de música finalizada.",
     "queueError": "Error: {error}",
+    "streamNotAllowed": "¡La transmisión de audio en vivo no está habilitada!",
     "startedPlaying": "🎶 Ahora reproduciendo: **{title}** {url}",
     "skipSong": "<@{author}> ⏩ Canción salteada.",
     "pauseSong": "<@{author}> ⏸ Musica pausada.",
@@ -161,5 +162,16 @@
     "errorNotChannel": "¡Primero debes unirte a un canal de voz!",
     "cooldownMessage": "Por favor espera {time} segundos antes de volver a usar el comando `{name}`.",
     "errorCommend": "Se produjo un error con ese comando."
-  }
+  },
+	"blacklist": {
+		"description": "Block user from using this bot.",
+		"noType": "Please provide a type. Use list, add, or remove.",
+		"noBlacklisted": "No one is blacklisted.",
+		"provideMember": "Please tag a member to blacklist.",
+		"botMember": "Please never blacklist a bot.",
+		"alreadyBlacklisted": "This user is already blacklisted.",
+		"doneBlacklisted": "User has been blacklisted.",
+		"notBlacklisted": "User is not blacklisted.",
+		"userWhitelisted": "User has been whitelisted."
+	}
 }

@@ -3,6 +3,8 @@ const { play } = require("../include/play");
 const { YOUTUBE_API_KEY, MAX_PLAYLIST_SIZE, SOUNDCLOUD_CLIENT_ID } = require("../config.json");
 const YouTubeAPI = require("simple-youtube-api");
 const youtube = new YouTubeAPI(YOUTUBE_API_KEY);
+const ytsr = require('ytsr');
+const { getTracks } = require('spotify-url-info');
 const scdl = require("soundcloud-downloader")
 
 module.exports = {
@@ -32,6 +34,8 @@ module.exports = {
 
     const search = args.join(" ");
     const pattern = /^.*(youtu.be\/|list=)([^#\&\?]*).*/gi;
+    const spotifyPlaylistPattern = /^.*(https:\/\/open\.spotify\.com\/playlist)([^#\&\?]*).*/gi;
+    const spotifyPlaylistValid = spotifyPlaylistPattern.test(args[0]);
     const url = args[0];
     const urlValid = pattern.test(args[0]);
 
@@ -46,10 +50,37 @@ module.exports = {
     };
 
     let song = null;
+    let newSongs = null;
     let playlist = null;
     let videos = [];
+    let waitMessage = null;
+    newSongs = videos;
 
-    if (urlValid) {
+    if (spotifyPlaylistValid) {
+      try {
+        waitMessage = await message.channel.send('fetching playlist...')
+        let playlistTrack = await getTracks(url);
+        if (playlistTrack > MAX_PLAYLIST_SIZE) {
+          playlistTrack.length = MAX_PLAYLIST_SIZE
+        }
+        const spotfiyPl = await Promise.all(playlistTrack.map(async (track) => {
+          let result;
+          const ytsrResult = await ytsr((`${track.name} - ${track.artists ? track.artists[0].name : ''}`), { limit: 1 });
+          result = ytsrResult.items[0];
+          return (song = {
+            title: result.title,
+            url: result.url,
+            duration: result.duration ? this.convert(result.duration) : undefined,
+            thumbnail: result.thumbnails ? result.thumbnails[0].url : undefined
+          });
+        }));
+        const result = await Promise.all(spotfiyPl.filter((song) => song.title != undefined || song.duration != undefined));
+        videos = result;
+      } catch (err) {
+        console.log(err);
+        return message.channel.send(err ? err.message : 'There was an error!');
+      }
+    } else if (urlValid) {
       try {
         playlist = await youtube.getPlaylist(url, { part: "snippet" });
         videos = await playlist.getVideos(MAX_PLAYLIST_SIZE || 10, { part: "snippet" });
@@ -97,8 +128,8 @@ module.exports = {
     });
 
     let playlistEmbed = new MessageEmbed()
-      .setTitle(`${playlist.title}`)
-      .setURL(playlist.url)
+      .setTitle(`${playlist ? playlist.title : 'Spotify Playlist'}`)
+      .setURL(playlist ? playlist.url : 'https://www.spotify.com/')
       .setColor("#F8AA2A")
       .setTimestamp();
 
@@ -109,6 +140,7 @@ module.exports = {
           playlistEmbed.description.substr(0, 2007) + "\nPlaylist larger than character limit...";
     }
 
+    waitMessage ? waitMessage.delete() : null
     message.channel.send(`${message.author} started a playlist`, playlistEmbed);
 
     if (!serverQueue) message.client.queue.set(message.guild.id, queueConstruct);
@@ -125,5 +157,16 @@ module.exports = {
         return message.channel.send(`Could not join the channel: ${error}`).catch(console.error);
       }
     }
+  },
+  convert(second) {
+    const a = second.split(':');
+    let rre
+    if (a.length == 2) {
+      rre = (+a[0]) * 60 + (+a[1])
+    } else {
+      rre = (+a[0]) * 60 * 60 + (+a[1]) * 60 + (+a[2])
+    }
+
+    return rre;
   }
 };

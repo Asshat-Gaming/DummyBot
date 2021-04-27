@@ -60,6 +60,7 @@
 		"cantJoinChannel": "Could not join the channel: {error}",
 		"queueEnded": "❌ Music queue ended.",
 		"queueError": "Error: {error}",
+        "streamNotAllowed": "Streaming live audio is not enabled!",
 		"startedPlaying": "🎶 Started playing: **{title}** {url}",
 		"skipSong": "<@{author}> ⏩ skipped the song",
 		"pauseSong": "<@{author}> ⏸ paused the music.",
@@ -188,5 +189,16 @@
 	},
 	"playlist-edit": {
 		"description": "Edit a saved playlist"
+	},
+	"blacklist": {
+		"description": "Block user from using this bot.",
+		"noType": "Please provide a type. Use list, add, or remove.",
+		"noBlacklisted": "No one is blacklisted.",
+		"provideMember": "Please tag a member to blacklist.",
+		"botMember": "Please never blacklist a bot.",
+		"alreadyBlacklisted": "This user is already blacklisted.",
+		"doneBlacklisted": "User has been blacklisted.",
+		"notBlacklisted": "User is not blacklisted.",
+		"userWhitelisted": "User has been whitelisted."
 	}
 }
