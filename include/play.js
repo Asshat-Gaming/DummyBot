@@ -1,6 +1,7 @@
 const ytdlDiscord = require("ytdl-core-discord");
 const scdl = require("soundcloud-downloader").default;
 const { canModifyQueue, STAY_TIME } = require("../util/DummyBotUtil");
+const urlLib = require("url");
 
 module.exports = {
   async play(song, message) {
@@ -24,16 +25,20 @@ module.exports = {
     try {
       if (song.url.includes("youtube.com")) {
         stream = await ytdlDiscord(song.url, { highWaterMark: 1 << 25 });
-      } else if (song.url.includes("soundcloud.com")) {
-        try {
-          stream = await scdl.downloadFormat(song.url, scdl.FORMATS.MP3, SOUNDCLOUD_CLIENT_ID);
-        } catch (error) {
-          stream = await scdl.downloadFormat(song.url, scdl.FORMATS.MP3, SOUNDCLOUD_CLIENT_ID);
+      } else {
+        const parsedUrl = urlLib.parse(song.url);
+        const host = parsedUrl.host;
+        if (host === "soundcloud.com") {
+          try {
+            stream = await scdl.downloadFormat(song.url, scdl.FORMATS.MP3, SOUNDCLOUD_CLIENT_ID);
+          } catch (error) {
+            stream = await scdl.downloadFormat(song.url, scdl.FORMATS.MP3, SOUNDCLOUD_CLIENT_ID);
+            streamType = "unknown";
+          }
+        } else if (streamRegex.test(song.url)) {
+          stream = song.url;
           streamType = "unknown";
         }
-      } else if (streamRegex.test(song.url)) {
-        stream = song.url;
-        streamType = "unknown";
       }
     } catch (error) {
       if (queue) {
