@@ -30,7 +30,7 @@
     "simple-youtube-api": "^5.2.1",
     "soundcloud-downloader": "^1.0.0",
     "spotify-uri": "^2.2.0",
-    "spotify-url-info": "^2.2.0",
+    "spotify-url-info": "^3.2.16",
     "string-progressbar": "^1.0.4",
     "valid-url": "^1.0.9",
     "winston": "^3.3.3",
