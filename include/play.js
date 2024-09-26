@@ -22,12 +22,12 @@ module.exports = {
     let streamType = song.url.includes("youtube.com") ? "opus" : "ogg/opus";
     let streamRegex = /^.*(mp3)$/gi;
 
+    const parsedUrl = urlLib.parse(song.url);
+    const host = parsedUrl.host;
     try {
-      if (song.url.includes("youtube.com")) {
+      if (host === "youtube.com") {
         stream = await ytdlDiscord(song.url, { highWaterMark: 1 << 25 });
       } else {
-        const parsedUrl = urlLib.parse(song.url);
-        const host = parsedUrl.host;
         if (host === "soundcloud.com") {
           try {
             stream = await scdl.downloadFormat(song.url, scdl.FORMATS.MP3, SOUNDCLOUD_CLIENT_ID);
