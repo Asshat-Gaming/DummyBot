@@ -15,7 +15,7 @@
     "@discordjs/opus": "^0.9.0",
     "array-move": "^3.0.1",
     "axios": "^1.7.4",
-    "clevertype": "^1.0.16",
+    "clevertype": "^2.0.4",
     "discord.js": "^12.5.3",
     "dotenv": "^8.2.0",
     "entities": "^2.2.0",
