@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "@discordjs/opus": "^0.9.0",
-    "array-move": "^3.0.1",
+    "array-move": "^4.0.0",
     "axios": "^1.7.7",
     "clevertype": "^2.0.4",
     "discord.js": "^14.16.3",
